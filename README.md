@@ -73,7 +73,7 @@ Mailgun requires three environment variables:
 
 Optionally, these can be stored in a `.env` file alongside the `feedbin_stars` script. The script will automatically read environment variables from that file. (See `.env.sample` for an example.)
 
-### See Also
+## See Also
 
 [Feedbin Auto Archiver](https://github.com/cdzombak/feedbin-auto-archiver)
 
