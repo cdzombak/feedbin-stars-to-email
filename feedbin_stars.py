@@ -165,10 +165,10 @@ def run(feedbin_api, mailgun_api, from_email, to, dry_run):
     for entry in entries:
         feed = feedbin_api.get_feed(entry['feed_id'])
         feed_title = feed['title']
-        title = entry['title']
-        url = entry['url']
-        summary = entry['summary']
-        content = entry['content']
+        title = entry['title'] or ''
+        url = entry['url'] or ''
+        summary = entry['summary'] or ''
+        content = entry['content'] or ''
         print('{:s}: {:s} ( {:s} )'.format(feed_title, title, url))
         html_body = '<strong><a href="{:s}">{:s}</a></strong><br><br>'.format(url, title)
         text_body = url + '\r\n\r\n'
