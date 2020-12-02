@@ -1,4 +1,4 @@
-# Feedbin Stars to Emtil
+# Feedbin Stars to Email
 
 Email starred items from Feedbin to a chosen email address — like your OmniFocus or Things inbox — and unstar/archive them in Feedbin.
 
