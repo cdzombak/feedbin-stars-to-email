@@ -1,50 +1,83 @@
 # Feedbin Stars to Email
 
-Email starred items from Feedbin to a chosen email address — like your OmniFocus or Things inbox — and unstar/archive them in Feedbin.
+Email starred items from Feedbin to a chosen email address — like your OmniFocus or Things inbox — and unstar/archive them in Feedbin.
 
-## Requirements
+## Installation (Docker)
 
-- Python 3 + [virtualenv](https://docs.python-guide.org/dev/virtualenvs/#lower-level-virtualenv)
-- A [Feedbin](https://feedbin.com) account
-- A [Mailgun](https://www.mailgun.com) account
-- Copy `.env.sample` to `.env` and fill out your credentials
+Pre-built Docker images are available. [See Docker Hub for details](https://hub.docker.com/r/cdzombak/feedbin-stars-to-things).
 
-I know this works on macOS and Ubuntu; it should work pretty much anywhere Python 3 runs.
+No installation is required to use these images under Docker.
 
-## Installation
+## Installation (local Python)
 
-- Clone the repo
-- Run `make bootstrap` to create a virtualenv for the project & install dependencies
+1. Clone the repo and change into the `feedbin-stars-to-things` directory
+2. Run `make virtualenv` to create a virtualenv for the project & install dependencies
 
-### Crontab Example
+## Configuration
 
-This is how I’m running this tool on my personal server:
+### Credentials
 
+Feedbin credentials are supplied via the environment variables `FEEDBIN_USERNAME` and `FEEDBIN_PASSWORD`.
+
+Mailgun requires three environment variables:
+- `MAILGUN_API`: the Mailgun API domain to use. This is `api.mailgun.net` unless you’re sending from Mailgun’s EU infrastructure; in that case use `api.eu.mailgun.net`.
+- `MAILGUN_DOMAIN`: your Mailgun domain (the domain part of your `--from` email address)
+- `MAILGUN_API_KEY`: your [Mailgun API key](https://app.mailgun.com/app/account/security/api_keys)
+
+#### Docker Configuration
+
+Credentials may be placed in a `.env` file and given to the `docker run` command like:
+
+```shell
+docker run --rm --env-file /path/to/.env cdzombak/feedbin-stars-to-things:1 [OPTIONS]
 ```
-# Feedbin Stars to Things
-*/10  *   *   *   *   /home/cdzombak/scripts/feedbin-stars/venv/bin/python3 /home/cdzombak/scripts/feedbin-stars/feedbin_stars.py --from "Feedbin <feedbin@notices.cdzombak.net>" --to "add-to-things-xxx@things.email" --dry-run false >/dev/null
+
+(See `.env.sample` for a sample file.)
+
+Alternatively, credentials may be passed directly to the `docker run` command like:
+
+```shell
+docker run --rm \
+    -e FEEDBIN_USERNAME=myusername \
+    -e FEEDBIN_PASSWORD=mypassword \
+    -e MAILGUN_API=api.mailgun.net \
+    -e MAILGUN_DOMAIN=notices.example.com \
+    -e MAILGUN_API_KEY=my_secret_mailgun_key \
+    cdzombak/feedbin-stars-to-things:1 [OPTIONS]
 ```
 
-### Cleanup
+#### Local Python Configuration
 
-`make clean` will remove the virtualenv and cleanup any temporary artifacts (currently, there are none of those).
+Your credentials can optionally be stored in a `.env` file alongside the `feedbin_stars.py` script. The script will automatically read environment variables from that file. (See `.env.sample` for an example.)
 
 ## Usage
 
-- Activate the virtualenv: `. venv/bin/activate`
-- Run the script: `python feedbin_stars.py [flags]`
+### Docker Usage
 
-At least some flags are needed to make the script do anything useful. Credential configuration is documented in “Configuration,” below.
+Invoke the script with `docker run`:
+
+```shell
+docker run --rm --env-file /path/to/.env cdzombak/feedbin-stars-to-things:1 [--dry-run false] --from feedbin@notices.example.com --to me@example.com
+```
+
+### Local Python Usage
+
+1. Activate the virtualenv: `. venv/bin/activate`
+2. Run the script: `python feedbin_stars.py [OPTIONS]`
+
+Alternatively, invoke the virtualenv's Python interpreter directly:
+
+```shell
+venv/bin/python3 feedbin_stars.py [--dry-run false] --from feedbin@notices.example.com --to me@example.com
+```
 
 ### Flags
-
-All flags are optional (though if you omit `--dry-run`, no changes will ever be made in your Feedbin account).
 
 #### `--dry-run`
 
 **Boolean. Default: True.**
 
-Dry-run specifies whether the script should actually change anything in your Feedbin account. By default, this is `true`, meaning no changes will be made. (In dry-run mode, emails will still be sent, since this doesn’t put any data at risk.)
+Dry-run specifies whether the script should actually change anything in your Feedbin account. By default, this is `true`, meaning no changes will be made. (In dry-run mode, emails will still be sent, since this doesn't put any data at risk.)
 
 Once you’re confident in your configuration, activate the script with `--dry-fun false`.
 
@@ -60,18 +93,15 @@ The email address to send from.
 
 The email address to send to.
 
-## Configuration
+### Crontab Example
 
-### Credentials
+This is how I’m running this tool on my home server:
 
-Feedbin credentials are supplied via the environment variables `FEEDBIN_USERNAME` and `FEEDBIN_PASSWORD`.
-
-Mailgun requires three environment variables:
-- `MAILGUN_API`: the Mailgun API domain to use. This is `api.mailgun.net` unless you’re sending from Mailgun’s EU infrastructure; in that case use `api.eu.mailgun.net`.
-- `MAILGUN_DOMAIN`: your Mailgun domain (the domain part of your `--from` emal address)
-- `MAILGUN_API_KEY`: your [Mailgun API key](https://app.mailgun.com/app/account/security/api_keys)
-
-Optionally, these can be stored in a `.env` file alongside the `feedbin_stars` script. The script will automatically read environment variables from that file. (See `.env.sample` for an example.)
+```
+# Feedbin Stars to Things
+# Runs every 10 minutes
+*/10  *   *   *   *   docker run --rm --env-file $HOME/.config/feedbin/env cdzombak/feedbin-stars-to-things:1 --from "Feedbin <feedbin@notices.cdzombak.net>" --to "add-to-things-xxx@things.email" --dry-run false
+```
 
 ## See Also
 
