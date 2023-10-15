@@ -204,6 +204,12 @@ if __name__ == '__main__':
 
     feedbin_user = os.getenv('FEEDBIN_USERNAME')
     feedbin_pass = os.getenv('FEEDBIN_PASSWORD')
+    # allow this program to use the same env file as
+    # https://github.com/cdzombak/feedbin-auto-archiver :
+    if not feedbin_user:
+        feedbin_user = os.getenv('FEEDBIN_ARCHIVER_USERNAME')
+    if not feedbin_pass:
+        feedbin_pass = os.getenv('FEEDBIN_ARCHIVER_PASSWORD')
     if not feedbin_user or not feedbin_pass:
         eprint("Feedbin username & password must be set using environment variables.")
         eprint("Copy .env.sample to .env and fill it out to provide credentials.")
