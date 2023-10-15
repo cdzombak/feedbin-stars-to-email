@@ -233,9 +233,7 @@ if __name__ == '__main__':
 
     try:
         run(feedbin_api, mailgun_api, from_email=args.from_email, to=args.to, dry_run=args.dry_run)
+        sys.exit(0)
     except FeedbinAPI.APIException as e:
         eprint(e.human_str)
         sys.exit(3)
-    sys.exit(0)
-
-    raise Exception('Unexpected/unhandled action argument encountered.')
