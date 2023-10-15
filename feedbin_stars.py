@@ -1,7 +1,6 @@
 #!venv/bin/python3
 
 import argparse
-import collections
 import html2text
 import json
 import os
