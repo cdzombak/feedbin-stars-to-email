@@ -97,7 +97,7 @@ The email address to send to.
 
 This is how I’m running this tool on my home server:
 
-```
+```text
 # Feedbin Stars to Things
 # Runs every 10 minutes
 */10  *   *   *   *   docker run --rm --env-file $HOME/.config/feedbin/env cdzombak/feedbin-stars-to-things:1 --from "Feedbin <feedbin@notices.cdzombak.net>" --to "add-to-things-xxx@things.email" --dry-run false

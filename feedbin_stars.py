@@ -4,21 +4,24 @@ import argparse
 import json
 import os
 import sys
+from typing import Final
 
 import html2text
 import requests
-
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-def chunks(l, n):
+TIMEOUT: Final = 20
+
+
+def chunks(a_list, n):
     # https://chrisalbon.com/python/data_wrangling/break_list_into_chunks_of_equal_size/
     # For item i in a range that is a length of l,
-    for i in range(0, len(l), n):
+    for i in range(0, len(a_list), n):
         # Create an index range for l of n items:
-        yield l[i : i + n]
+        yield a_list[i : i + n]
 
 
 def eprint(*args, **kwargs):
@@ -47,7 +50,9 @@ class MailgunAPI(object):
             data["text"] = text
         if html:
             data["html"] = html
-        return requests.post(self.api_endpoint, auth=self.auth, data=data)
+        return requests.post(
+            self.api_endpoint, auth=self.auth, data=data, timeout=TIMEOUT
+        )
 
 
 class FeedbinAPI(object):
@@ -68,7 +73,10 @@ class FeedbinAPI(object):
 
         @property
         def human_str(self):
-            return "Feedbin API Error: {msg:s}\n{method:s}: {url:s}\nHTTP Status: {status}\nError Detail:\n{detail}".format(
+            return (
+                "Feedbin API Error: {msg:s}\n{method:s}: {url:s}\n"
+                "HTTP Status: {status}\nError Detail:\n{detail}"
+            ).format(
                 msg=self.__str__(),
                 status=self.status_code or "[unknown]",
                 detail=json.dumps(self.errors, sort_keys=True, indent=2),
@@ -102,7 +110,7 @@ class FeedbinAPI(object):
         results = resp.json()
         next_url = resp.links.get("next")
         while next_url:
-            resp = requests.get(next_url, auth=self.auth)
+            resp = requests.get(next_url, auth=self.auth, timeout=TIMEOUT)
             self._check_response(resp)
             results.extend(resp.json())
             next_url = resp.links.get("next")
@@ -112,7 +120,7 @@ class FeedbinAPI(object):
         url = "{base:s}/{endpoint:s}.json".format(
             base=FeedbinAPI.API_BASE, endpoint=endpoint
         )
-        resp = requests.get(url, auth=self.auth, params=params)
+        resp = requests.get(url, auth=self.auth, params=params, timeout=TIMEOUT)
         self._check_response(resp)
         return resp
 
@@ -135,13 +143,15 @@ class FeedbinAPI(object):
         return self._get_decoded("feeds/{}".format(feed_id))
 
     def check_auth(self):
-        r = self._get("authentication")
+        self._get("authentication")
 
     def mark_read(self, entry_id):
         url = "{base:s}/{endpoint:s}.json".format(
             base=FeedbinAPI.API_BASE, endpoint="unread_entries"
         )
-        resp = requests.delete(url, auth=self.auth, json={"unread_entries": [entry_id]})
+        resp = requests.delete(
+            url, auth=self.auth, json={"unread_entries": [entry_id]}, timeout=TIMEOUT
+        )
         self._check_response(resp)
 
     def unstar(self, entry_id):
@@ -149,7 +159,7 @@ class FeedbinAPI(object):
             base=FeedbinAPI.API_BASE, endpoint="starred_entries"
         )
         resp = requests.delete(
-            url, auth=self.auth, json={"starred_entries": [entry_id]}
+            url, auth=self.auth, json={"starred_entries": [entry_id]}, timeout=TIMEOUT
         )
         self._check_response(resp)
 
@@ -208,7 +218,8 @@ if __name__ == "__main__":
         "--dry-run",
         type=str2bool,
         default="true",
-        help="True to send mail, but not unstar/archive anything in Feedbin. False to send mail, unstar and archive starred entries. Default: True.",
+        help="True to send mail, but not unstar/archive anything in Feedbin. "
+        "False to send mail, unstar and archive starred entries. Default: True.",
     )
     parser.add_argument(
         "--from",
