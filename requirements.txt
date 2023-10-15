@@ -4,4 +4,4 @@ html2text==2020.1.16
 idna==2.9
 python-dotenv==0.10.1
 requests==2.23.0
-urllib3==1.25.8
+urllib3==1.26.17
