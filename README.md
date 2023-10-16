@@ -4,13 +4,13 @@ Email starred items from Feedbin to a chosen email address — like your OmniFoc
 
 ## Installation (Docker)
 
-Pre-built Docker images are available. [See Docker Hub for details](https://hub.docker.com/r/cdzombak/feedbin-stars-to-things).
+Pre-built Docker images are available. [See Docker Hub for details](https://hub.docker.com/r/cdzombak/feedbin-stars-to-email).
 
 No installation is required to use these images under Docker.
 
 ## Installation (local Python)
 
-1. Clone the repo and change into the `feedbin-stars-to-things` directory
+1. Clone the repo and change into the `feedbin-stars-to-email` directory
 2. Run `make virtualenv` to create a virtualenv for the project & install dependencies
 
 ## Configuration
@@ -29,7 +29,7 @@ Mailgun requires three environment variables:
 Credentials may be placed in a `.env` file and given to the `docker run` command like:
 
 ```shell
-docker run --rm --env-file /path/to/.env cdzombak/feedbin-stars-to-things:1 [OPTIONS]
+docker run --rm --env-file /path/to/.env cdzombak/feedbin-stars-to-email:1 [OPTIONS]
 ```
 
 (See `.env.sample` for a sample file.)
@@ -43,7 +43,7 @@ docker run --rm \
     -e MAILGUN_API=api.mailgun.net \
     -e MAILGUN_DOMAIN=notices.example.com \
     -e MAILGUN_API_KEY=my_secret_mailgun_key \
-    cdzombak/feedbin-stars-to-things:1 [OPTIONS]
+    cdzombak/feedbin-stars-to-email:1 [OPTIONS]
 ```
 
 #### Local Python Configuration
@@ -57,7 +57,7 @@ Your credentials can optionally be stored in a `.env` file alongside the `feedbi
 Invoke the script with `docker run`:
 
 ```shell
-docker run --rm --env-file /path/to/.env cdzombak/feedbin-stars-to-things:1 [--dry-run false] --from feedbin@notices.example.com --to me@example.com
+docker run --rm --env-file /path/to/.env cdzombak/feedbin-stars-to-email:1 [--dry-run false] --from feedbin@notices.example.com --to me@example.com
 ```
 
 ### Local Python Usage
@@ -100,7 +100,7 @@ This is how I’m running this tool on my home server:
 ```text
 # Feedbin Stars to Things
 # Runs every 10 minutes
-*/10  *   *   *   *   docker run --rm --env-file $HOME/.config/feedbin/env cdzombak/feedbin-stars-to-things:1 --from "Feedbin <feedbin@notices.cdzombak.net>" --to "add-to-things-xxx@things.email" --dry-run false
+*/10  *   *   *   *   docker run --rm --env-file $HOME/.config/feedbin/env cdzombak/feedbin-stars-to-email:1 --from "Feedbin <feedbin@notices.cdzombak.net>" --to "add-to-email-xxx@things.email" --dry-run false
 ```
 
 ## See Also
